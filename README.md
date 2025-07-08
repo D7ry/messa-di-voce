@@ -1,12 +1,4 @@
-# React + Vite
+# Messa De Voce
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+I play piano and i got annoyed that when referencing different interpretations of a same piece on spotify I have to constantly fiddle with my phone. So I vibe coded this to store a quick-access list of music segments that I could just click play.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
