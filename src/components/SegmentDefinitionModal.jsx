@@ -1,135 +1,31 @@
 
+// src/components/SegmentDefinitionModal.jsx
 import React, { useState, useRef, useEffect } from 'react';
-import styled from 'styled-components';
+import {
+  ModalOverlay,
+  ModalContent,
+  TimeInputGroup,
+  ActionButton,
+  CloseButton,
+  PreviewButton,
+} from '../styles/StyledComponents';
 
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1001; /* Higher z-index than search modal */
-`;
-
-const ModalContent = styled.div`
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 30px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto;
-`;
-
-const TimeInputGroup = styled.div`
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-top: 10px;
-
-  input {
-    width: 50px;
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    font-size: 0.9em;
-  }
-`;
-
-const ActionButton = styled.button`
-  background: linear-gradient(145deg, #007bff, #0056b3);
-  color: white;
-  padding: 8px 15px;
-  border-radius: 8px;
-  font-size: 0.9em;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-
-  &:hover {
-    background: linear-gradient(145deg, #0056b3, #007bff);
-    transform: translateY(-1px);
-  }
-`;
-
-const CloseButton = styled(ActionButton)`
-  background: linear-gradient(145deg, #dc3545, #c82333);
-  &:hover {
-    background: linear-gradient(145deg, #c82333, #dc3545);
-  }
-`;
-
-const PreviewButton = styled(ActionButton)`
-  background: linear-gradient(145deg, #1DB954, #1ED760); /* Spotify Green */
-  &:hover {
-    background: linear-gradient(145deg, #1ED760, #1DB954);
-  }
-`;
-
-const SliderContainer = styled.div`
-  width: 100%;
-  margin-top: 20px;
-  position: relative;
-  height: 40px; /* Give some height for the slider */
-`;
-
-const RangeSlider = styled.input`
-  width: 100%;
-  -webkit-appearance: none;
-  height: 8px;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.2);
-  outline: none;
-  opacity: 0.7;
-  -webkit-transition: .2s;
-  transition: opacity .2s;
-
-  &::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #007bff;
-    cursor: pointer;
-  }
-
-  &::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #007bff;
-    cursor: pointer;
-  }
-`;
-
-const SegmentRange = styled.div`
-  position: absolute;
-  height: 8px;
-  background: linear-gradient(90deg, #1DB954, #1ED760); /* Highlighted segment */
-  border-radius: 5px;
-  top: 16px; /* Align with slider track */
-  pointer-events: none; /* Allow interaction with slider underneath */
-`;
-
+/**
+ * SegmentDefinitionModal component for defining start and end times of a musical segment.
+ * It provides numerical inputs for precise segment selection.
+ */
 const SegmentDefinitionModal = ({ track, accessToken, onClose, onSaveSegment, player, activeDeviceId }) => {
+  // State for the start and end milliseconds of the segment.
   const [startMs, setStartMs] = useState(0);
   const [endMs, setEndMs] = useState(0);
 
+  // Ref for managing audio playback of the segment preview.
   const audioRef = useRef(null);
 
+  /**
+   * Initializes start and end times when the modal opens or the track changes.
+   * Also handles cleanup of any ongoing audio playback when the modal closes.
+   */
   useEffect(() => {
     // Initialize start and end times based on track duration when modal opens
     setStartMs(0);
@@ -144,6 +40,11 @@ const SegmentDefinitionModal = ({ track, accessToken, onClose, onSaveSegment, pl
     };
   }, [track]);
 
+  /**
+   * Formats duration from milliseconds to a human-readable M:SS string.
+   * @param {number} ms - Duration in milliseconds.
+   * @returns {string} Formatted duration string (e.g., "3:45").
+   */
   const formatDuration = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -151,6 +52,9 @@ const SegmentDefinitionModal = ({ track, accessToken, onClose, onSaveSegment, pl
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
+  /**
+   * Handles playing a preview of the defined segment using the Spotify Web Playback SDK.
+   */
   const handlePreviewSegment = async () => {
     if (!player || !activeDeviceId || !accessToken) {
       alert('Spotify player not ready. Please ensure you are logged in and have Spotify Premium.');
@@ -192,7 +96,9 @@ const SegmentDefinitionModal = ({ track, accessToken, onClose, onSaveSegment, pl
       // Stop playback after the segment duration
       const duration = endMs - startMs;
       setTimeout(() => {
-        player.pause();
+        if (player) {
+          player.pause();
+        }
       }, duration);
 
     } catch (error) {
@@ -201,6 +107,10 @@ const SegmentDefinitionModal = ({ track, accessToken, onClose, onSaveSegment, pl
     }
   };
 
+  /**
+   * Handles saving the defined segment and closing the modal.
+   * Performs validation before saving.
+   */
   const handleSave = () => {
     if (startMs >= endMs) {
       alert('End time must be greater than start time.');
@@ -215,44 +125,71 @@ const SegmentDefinitionModal = ({ track, accessToken, onClose, onSaveSegment, pl
     onClose(); // Close modal after saving
   };
 
-  const handleStartSliderChange = (e) => {
-    const value = parseInt(e.target.value, 10);
-    setStartMs(value);
-  };
+  
 
-  const handleEndSliderChange = (e) => {
-    const value = parseInt(e.target.value, 10);
-    setEndMs(value);
-  };
-
-  // Sync numerical inputs with slider values
+  /**
+   * Synchronizes numerical input changes with the internal startMs state.
+   * @param {string} unit - 'minutes' or 'seconds'.
+   * @param {number} value - The new numerical value.
+   */
   const handleStartTimeChange = (unit, value) => {
-    let newMs = 0;
+    let currentMinutes = Math.floor(startMs / 60000);
+    let currentSeconds = Math.floor((startMs % 60000) / 1000);
+    let newMinutes = currentMinutes;
+    let newSeconds = currentSeconds;
+
     if (unit === 'minutes') {
-      newMs = (value * 60 + Math.floor((startMs % 60000) / 1000)) * 1000;
-    } else {
-      newMs = (Math.floor(startMs / 60000) * 60 + value) * 1000;
+      newMinutes = parseInt(value, 10) || 0;
+    } else { // unit === 'seconds'
+      newSeconds = parseInt(value, 10) || 0;
+      // Handle rollover for seconds
+      if (newSeconds >= 60) {
+        newMinutes += Math.floor(newSeconds / 60);
+        newSeconds %= 60;
+      } else if (newSeconds < 0) { // Handle negative input
+        newMinutes += Math.floor(newSeconds / 60); // Will be negative or zero
+        newSeconds = (newSeconds % 60 + 60) % 60; // Ensure positive remainder
+      }
     }
-    setStartMs(newMs);
+    const newTotalMs = (newMinutes * 60 + newSeconds) * 1000;
+    setStartMs(Math.min(newTotalMs, endMs)); // Ensure startMs <= endMs
   };
 
+  /**
+   * Synchronizes numerical input changes with the internal endMs state.
+   * @param {string} unit - 'minutes' or 'seconds'.
+   * @param {number} value - The new numerical value.
+   */
   const handleEndTimeChange = (unit, value) => {
-    let newMs = 0;
+    let currentMinutes = Math.floor(endMs / 60000);
+    let currentSeconds = Math.floor((endMs % 60000) / 1000);
+    let newMinutes = currentMinutes;
+    let newSeconds = currentSeconds;
+
     if (unit === 'minutes') {
-      newMs = (value * 60 + Math.floor((endMs % 60000) / 1000)) * 1000;
-    } else {
-      newMs = (Math.floor(endMs / 60000) * 60 + value) * 1000;
+      newMinutes = parseInt(value, 10) || 0;
+    } else { // unit === 'seconds'
+      newSeconds = parseInt(value, 10) || 0;
+      // Handle rollover for seconds
+      if (newSeconds >= 60) {
+        newMinutes += Math.floor(newSeconds / 60);
+        newSeconds %= 60;
+      } else if (newSeconds < 0) {
+        newMinutes += Math.floor(newSeconds / 60);
+        newSeconds = (newSeconds % 60 + 60) % 60;
+      }
     }
-    setEndMs(newMs);
+    const newTotalMs = (newMinutes * 60 + newSeconds) * 1000;
+    setEndMs(Math.max(newTotalMs, startMs)); // Ensure endMs >= startMs
   };
 
+  // Derived state for displaying minutes and seconds in input fields.
   const startMinutes = Math.floor(startMs / 60000);
   const startSeconds = Math.floor((startMs % 60000) / 1000);
   const endMinutes = Math.floor(endMs / 60000);
   const endSeconds = Math.floor((endMs % 60000) / 1000);
 
-  const segmentWidth = ((endMs - startMs) / track.duration_ms) * 100;
-  const segmentLeft = (startMs / track.duration_ms) * 100;
+  
 
   return (
     <ModalOverlay>
@@ -300,23 +237,7 @@ const SegmentDefinitionModal = ({ track, accessToken, onClose, onSaveSegment, pl
           <span>sec</span>
         </TimeInputGroup>
 
-        <SliderContainer>
-          <SegmentRange style={{ left: `${segmentLeft}%`, width: `${segmentWidth}%` }} />
-          <RangeSlider
-            type="range"
-            min="0"
-            max={track.duration_ms}
-            value={startMs}
-            onChange={handleStartSliderChange}
-          />
-          <RangeSlider
-            type="range"
-            min="0"
-            max={track.duration_ms}
-            value={endMs}
-            onChange={handleEndSliderChange}
-          />
-        </SliderContainer>
+        
 
         <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
           <PreviewButton onClick={handlePreviewSegment}>Preview Segment</PreviewButton>

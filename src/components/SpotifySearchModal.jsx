@@ -1,147 +1,39 @@
-
+// src/components/SpotifySearchModal.jsx
 import React, { useState, useRef } from 'react';
-import styled from 'styled-components';
+import {
+  ModalOverlay,
+  ModalContent,
+  SearchInput,
+  SearchButton,
+  TrackList,
+  TrackItem,
+  TrackInfo,
+  TrackTitle,
+  TrackArtist,
+  TrackActions,
+  ActionButton,
+  CloseButton,
+} from '../styles/StyledComponents';
 import SegmentDefinitionModal from './SegmentDefinitionModal';
 
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled.div`
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 30px;
-  width: 90%;
-  max-width: 700px;
-  max-height: 80vh; /* Limit height for scrolling */
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto; /* Enable scrolling for content */
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  font-size: 1em;
-
-  &::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-  }
-`;
-
-const SearchButton = styled.button`
-  background: linear-gradient(145deg, #1DB954, #1ED760); /* Spotify Green */
-  color: white;
-  padding: 12px 20px;
-  border-radius: 10px;
-  font-size: 1em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-
-  &:hover {
-    background: linear-gradient(145deg, #1ED760, #1DB954);
-    transform: translateY(-2px);
-  }
-`;
-
-const TrackList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`;
-
-const TrackItem = styled.div`
-  background: rgba(255, 255, 255, 0.08);
-  padding: 15px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-
-  @media (min-width: 768px) {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-`;
-
-const TrackInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-`;
-
-const TrackTitle = styled.span`
-  font-weight: 600;
-  font-size: 1.1em;
-`;
-
-const TrackArtist = styled.span`
-  font-size: 0.9em;
-  color: #bbb;
-`;
-
-const TrackActions = styled.div`
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-
-  @media (min-width: 768px) {
-    margin-top: 0;
-  }
-`;
-
-const ActionButton = styled.button`
-  background: linear-gradient(145deg, #007bff, #0056b3);
-  color: white;
-  padding: 8px 15px;
-  border-radius: 8px;
-  font-size: 0.9em;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-
-  &:hover {
-    background: linear-gradient(145deg, #0056b3, #007bff);
-    transform: translateY(-1px);
-  }
-`;
-
-const CloseButton = styled(ActionButton)`
-  background: linear-gradient(145deg, #dc3545, #c82333);
-  &:hover {
-    background: linear-gradient(145deg, #c82333, #dc3545);
-  }
-`;
-
+/**
+ * SpotifySearchModal component for searching Spotify tracks and initiating segment definition.
+ * Allows users to search for songs, preview them, and then select a track to define a musical segment.
+ */
 const SpotifySearchModal = ({ accessToken, onClose, onSelectTrack, player, activeDeviceId }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [trackToDefineSegment, setTrackToDefineSegment] = useState(null); // New state for track to define segment
+  // State to hold the track selected by the user for segment definition.
+  const [trackToDefineSegment, setTrackToDefineSegment] = useState(null);
 
+  // Ref for managing audio playback of track previews.
   const audioRef = useRef(null);
 
+  /**
+   * Handles the search functionality, fetching tracks from the Spotify API.
+   */
   const handleSearch = async () => {
     if (!searchTerm) return;
     setLoading(true);
@@ -169,7 +61,12 @@ const SpotifySearchModal = ({ accessToken, onClose, onSelectTrack, player, activ
     }
   };
 
+  /**
+   * Handles playing a short preview of a track.
+   * Uses the `preview_url` provided by the Spotify API.
+   */
   const handlePreview = (previewUrl) => {
+    // Stop any currently playing audio before starting a new preview.
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -189,16 +86,27 @@ const SpotifySearchModal = ({ accessToken, onClose, onSelectTrack, player, activ
     }
   };
 
+  /**
+   * Sets the selected track for which the user wants to define a segment.
+   * Opens the SegmentDefinitionModal.
+   */
   const handleSelectForSegment = (track) => {
     setTrackToDefineSegment(track);
   };
 
+  /**
+   * Callback function passed to SegmentDefinitionModal to save the defined segment.
+   * Closes both the segment definition modal and the search modal.
+   */
   const handleSaveSegment = (track, start_ms, end_ms) => {
     onSelectTrack(track, start_ms, end_ms);
     setTrackToDefineSegment(null); // Close segment definition modal
     onClose(); // Close search modal
   };
 
+  /**
+   * Formats duration from milliseconds to a human-readable M:SS string.
+   */
   const formatDuration = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -258,6 +166,7 @@ const SpotifySearchModal = ({ accessToken, onClose, onSelectTrack, player, activ
         <CloseButton onClick={onClose}>Close</CloseButton>
       </ModalContent>
 
+      {/* Render SegmentDefinitionModal if a track is selected for segment definition */}
       {trackToDefineSegment && (
         <SegmentDefinitionModal
           track={trackToDefineSegment}
