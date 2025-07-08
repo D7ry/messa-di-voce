@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 
@@ -9,20 +8,11 @@ const GlobalStyle = createGlobalStyle`
     font-family: 'Inter', sans-serif;
     background: linear-gradient(135deg, #0a0a1a, #1a1a3a); /* Deeper, more vibrant gradient */
     margin: 0;
-    display: flex;
-    place-items: center;
-    min-width: 100vw;
-    min-height: 100vh;
-    overflow: hidden;
     color: white;
   }
 
   #root {
     width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
 `;
 
@@ -30,49 +20,36 @@ const AppContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 100vh;
+  min-height: 100vh; /* Ensure it takes full viewport height */
   width: 100%;
-  background: transparent; /* Handled by GlobalStyle */
-  color: white;
-  padding: 10px; /* Reduced padding for mobile */
+  background: rgba(255, 255, 255, 0.08); /* Moved from GlassMorphismCard */
+  border-radius: 25px; /* Moved from GlassMorphismCard */
+  border: 1px solid rgba(255, 255, 255, 0.15); /* Moved from GlassMorphismCard */
+  box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.4); /* Moved from GlassMorphismCard */
+  backdrop-filter: blur(15px) saturate(180%); /* Moved from GlassMorphismCard */
+  -webkit-backdrop-filter: blur(15px) saturate(180%); /* Moved from GlassMorphismCard */
+  padding: 20px; /* Reduced padding for mobile */
+  margin: 20px auto; /* Center horizontally, add vertical margin */
+  max-width: 600px; /* Max width for single column */
   box-sizing: border-box;
+  overflow-y: auto; /* Allow AppContainer to scroll */
+  color: white;
+  gap: 15px; /* Reduced gap for mobile */
 
   h1 {
     font-size: 2em; /* Smaller heading for mobile */
     margin-bottom: 15px;
+    text-align: center;
   }
 
   @media (min-width: 768px) {
-    padding: 20px;
+    padding: 30px;
+    max-width: 800px; /* Slightly wider for desktop single column */
+    gap: 25px;
     h1 {
       font-size: 3.2em; /* Original heading size for desktop */
       margin-bottom: 20px;
     }
-  }
-`;
-
-const GlassMorphismCard = styled.div`
-  background: rgba(255, 255, 255, 0.08); /* More subtle background */
-  border-radius: 25px; /* Slightly more rounded */
-  border: 1px solid rgba(255, 255, 255, 0.15); /* Thicker, more visible border */
-  box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.4); /* Stronger shadow for depth */
-  backdrop-filter: blur(15px) saturate(180%); /* Increased blur and saturation */
-  -webkit-backdrop-filter: blur(15px) saturate(180%);
-  padding: 20px; /* Reduced padding for mobile */
-  margin: 10px; /* Reduced margin for mobile */
-  width: 98%; /* Wider for mobile */
-  max-width: 1400px; /* Increased max-width */
-  display: flex;
-  flex-direction: column; /* Always column on mobile */
-  gap: 15px; /* Reduced gap for mobile */
-
-  @media (min-width: 768px) {
-    padding: 30px;
-    margin: 20px;
-    width: 90%;
-    flex-direction: row; /* Row on desktop */
-    gap: 25px;
   }
 `;
 
@@ -86,6 +63,27 @@ const Section = styled.div`
   flex-direction: column;
   gap: 10px; /* Reduced gap for mobile */
   transition: all 0.3s ease-in-out;
+  max-height: 60vh; /* Allow scrolling within section */
+  overflow-y: auto; /* Enable vertical scrolling */
+
+  /* Custom scrollbar for a sleek look */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
 
   &:hover {
     background: rgba(255, 255, 255, 0.05);
@@ -98,34 +96,23 @@ const Section = styled.div`
   }
 `;
 
-const PiecesSection = styled(Section)`
-  flex: 1; /* Full width on mobile */
-  min-width: unset; /* Remove min-width on mobile */
-
-  @media (min-width: 768px) {
-    flex: 0.4; /* Smaller width for pieces */
-    min-width: 250px;
-  }
-`;
-
-const SegmentsSection = styled(Section)`
-  flex: 1; /* Full width on mobile */
-
-  @media (min-width: 768px) {
-    flex: 1.6; /* Larger width for segments */
-  }
+const SectionHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 10px; /* Space between items */
 `;
 
 const SectionTitle = styled.h2`
   font-size: 1.4em; /* Smaller title for mobile */
-  margin-bottom: 10px; /* Reduced margin for mobile */
   color: #e0e0e0;
   font-weight: 600;
-  text-align: center;
+  margin: 0; /* Remove default margin */
 
   @media (min-width: 768px) {
     font-size: 1.8em;
-    margin-bottom: 15px;
   }
 `;
 
@@ -172,17 +159,16 @@ const SegmentPlayer = styled.span`
   }
 `;
 
-const AddButton = styled.button`
+const ActionButton = styled.button`
   background: linear-gradient(145deg, #007bff, #0056b3); /* Blue gradient */
   color: white;
   padding: 10px 15px; /* Reduced padding for mobile */
   border-radius: 12px;
-  font-size: 1em; /* Smaller font for mobile */
+  font-size: 0.9em; /* Smaller font for mobile */
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
-  margin-top: 10px; /* Reduced margin for mobile */
 
   &:hover {
     background: linear-gradient(145deg, #0056b3, #007bff); /* Reverse gradient on hover */
@@ -198,7 +184,13 @@ const AddButton = styled.button`
   @media (min-width: 768px) {
     padding: 12px 20px;
     font-size: 1.1em;
-    margin-top: 15px;
+  }
+`;
+
+const BackButton = styled(ActionButton)`
+  background: linear-gradient(145deg, #6c757d, #5a6268); /* Grey gradient for back button */
+  &:hover {
+    background: linear-gradient(145deg, #5a6268, #6c757d);
   }
 `;
 
@@ -222,7 +214,7 @@ function App() {
     },
   ]);
 
-  const [selectedPiece, setSelectedPiece] = useState(pieces[0]); // Select first piece by default
+  const [selectedPiece, setSelectedPiece] = useState(null);
 
   const handleAddPiece = () => {
     const newPieceName = prompt('Enter new piece name:');
@@ -243,7 +235,7 @@ function App() {
         : piece
     ));
 
-    // If the newly added segment belongs to the currently selected piece, update selectedPiece to re-render
+    // Update selectedPiece to trigger re-render if the current piece is modified
     if (selectedPiece && selectedPiece.id === pieceId) {
       setSelectedPiece(prev => ({
         ...prev,
@@ -256,38 +248,37 @@ function App() {
     <AppContainer>
       <GlobalStyle />
       <h1>Messa Di Voce</h1>
-      <GlassMorphismCard>
-        <PiecesSection>
-          <SectionTitle>Pieces</SectionTitle>
+      {!selectedPiece ? (
+        <Section>
+          <SectionHeader>
+            <SectionTitle>Pieces</SectionTitle>
+            <ActionButton onClick={handleAddPiece}>Add Piece</ActionButton>
+          </SectionHeader>
           {pieces.map(piece => (
             <ListItem key={piece.id} onClick={() => setSelectedPiece(piece)}>
               {piece.name}
             </ListItem>
           ))}
-          <AddButton onClick={handleAddPiece}>Add Piece</AddButton>
-        </PiecesSection>
-
-        <SegmentsSection>
-          <SectionTitle>Segments for {selectedPiece ? selectedPiece.name : ''}</SectionTitle>
-          {selectedPiece ? (
-            <>
-              {selectedPiece.segments.length > 0 ? (
-                selectedPiece.segments.map(segment => (
-                  <ListItem key={segment.id}>
-                    <SegmentName>{segment.name}</SegmentName>
-                    <SegmentPlayer>{segment.player}</SegmentPlayer>
-                  </ListItem>
-                ))
-              ) : (
-                <p>No segments for this piece yet. Add one!</p>
-              )}
-              <AddButton onClick={() => handleAddSegment(selectedPiece.id)}>Add Segment</AddButton>
-            </>
+        </Section>
+      ) : (
+        <Section>
+          <SectionHeader>
+            <SectionTitle>Segments for {selectedPiece.name}</SectionTitle>
+            <ActionButton onClick={() => handleAddSegment(selectedPiece.id)}>Add Segment</ActionButton>
+            <BackButton onClick={() => setSelectedPiece(null)}>Back to Pieces</BackButton>
+          </SectionHeader>
+          {selectedPiece.segments.length > 0 ? (
+            selectedPiece.segments.map(segment => (
+              <ListItem key={segment.id}>
+                <SegmentName>{segment.name}</SegmentName>
+                <SegmentPlayer>{segment.player}</SegmentPlayer>
+              </ListItem>
+            ))
           ) : (
-            <p>Select a piece to view and add segments.</p>
+            <p>No segments for this piece yet. Add one!</p>
           )}
-        </SegmentsSection>
-      </GlassMorphismCard>
+        </Section>
+      )}
     </AppContainer>
   );
 }
