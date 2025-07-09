@@ -1,5 +1,5 @@
 const CLIENT_ID = 'dedaf532a216473f9b9c436d5f2235b0';
-const REDIRECT_URI = 'http://localhost:5173/callback';
+const REDIRECT_URI = 'https://d7ry.github.io/messa-di-voce/callback';
 const SCOPES = 'user-read-private user-read-email streaming user-read-playback-state user-modify-playback-state';
 
 // Function to generate a random string for PKCE
