@@ -12,8 +12,10 @@
     // This allows the SPA's client-side router to pick up the original path and render the correct content.
     var path = window.location.pathname;
     var query = window.location.search;
-    var homepage = window.location.origin + '/messa-di-voce'; // Replace with your actual homepage URL
-    window.location.replace(homepage + '?' + path.slice(1) + query);
+    var homepage = window.location.origin + '/messa-di-voce';
+    // Remove the base path from the beginning of the path
+    var relativePath = path.replace('/messa-di-voce', '');
+    window.location.replace(homepage + '?' + relativePath.slice(1) + query);
   </script>
 </head>
 <body>
