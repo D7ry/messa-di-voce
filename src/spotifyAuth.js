@@ -1,5 +1,8 @@
 const CLIENT_ID = 'dedaf532a216473f9b9c436d5f2235b0';
-const REDIRECT_URI = 'https://d7ry.github.io/messa-di-voce/callback';
+//const REDIRECT_URI = 'https://d7ry.github.io/messa-di-voce/callback';
+const REDIRECT_URI = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? `${window.location.origin}/messa-di-voce/callback`
+  : 'https://d7ry.github.io/messa-di-voce/callback';
 const SCOPES = 'user-read-private user-read-email streaming user-read-playback-state user-modify-playback-state';
 
 // Function to generate a random string for PKCE
@@ -46,7 +49,7 @@ export async function getAccessToken(code) {
   console.log('Attempting to get access token with code:', code, 'and verifier:', verifier);
 
   if (!verifier) {
-    console.error('Error: No code_verifier found in localStorage.');
+    console.error('Error: No code_verifier found in localStorage. This might happen if the user navigates directly to the callback URL or if localStorage is cleared.');
     return null;
   }
 

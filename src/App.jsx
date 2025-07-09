@@ -25,6 +25,7 @@ import SpotifySearchModal from './components/SpotifySearchModal';
  * Manages authentication, piece and segment data, and modal visibility.
  */
 function App() {
+  console.log('App component rendered.');
   // State to hold the list of musical practice sets and their segments.
   const [practiceSets, setPracticeSets] = useState(() => {
     const storedPracticeSets = localStorage.getItem('practiceSets');
@@ -52,6 +53,8 @@ function App() {
   const [selectedPiece, setSelectedPiece] = useState(null);
   // State to store the Spotify access token.
   const [accessToken, setAccessToken] = useState(null);
+  // State to indicate if authentication is in progress.
+  const [loadingAuth, setLoadingAuth] = useState(true);
   // State to control the visibility of the Spotify search modal.
   const [showSearchModal, setShowSearchModal] = useState(false);
   // State to hold the Spotify Web Playback SDK player instance.
@@ -65,13 +68,17 @@ function App() {
   // Effect hook to handle Spotify authentication on component mount.
   useEffect(() => {
     async function handleAuth() {
+      setLoadingAuth(true); // Start loading
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code');
+      console.log('App.jsx: Initializing auth. Code in URL:', code);
 
       if (code) {
         // If a code is present in the URL, exchange it for an access token.
         const token = await getAccessToken(code);
+        console.log('App.jsx: Token received from getAccessToken:', token);
         setAccessToken(token);
+        console.log('App.jsx: Access token set to:', token);
         // Clear the code from the URL to prevent re-processing on refresh.
         window.history.replaceState({}, document.title, window.location.pathname);
       } else {
@@ -79,11 +86,18 @@ function App() {
         const storedToken = getStoredAccessToken();
         if (storedToken) {
           setAccessToken(storedToken);
+          console.log('App.jsx: Stored access token found and set:', storedToken);
+        } else {
+          console.log('App.jsx: No code and no stored token found.');
         }
       }
+      setLoadingAuth(false); // End loading
+      console.log('App.jsx: setLoadingAuth(false). Current accessToken:', accessToken);
     }
     handleAuth();
   }, []); // Run only once on component mount.
+
+  console.log('App.jsx: Rendering with loadingAuth:', loadingAuth, 'accessToken:', accessToken);
 
   // Define onSpotifyWebPlaybackSDKReady globally and immediately
   useEffect(() => {
@@ -285,6 +299,16 @@ function App() {
   };
 
   // Conditional rendering based on authentication status.
+  if (loadingAuth) {
+    return (
+      <LoginContainer>
+        <GlobalStyle />
+        <h1>Messa Di Voce</h1>
+        <h2>Loading...</h2>
+      </LoginContainer>
+    );
+  }
+
   if (!accessToken) {
     return (
       <LoginContainer>

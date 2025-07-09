@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+  <script>
+    // Get the query string
+    var query = window.location.search;
+    // Get the hash
+    var hash = window.location.hash;
+
+    // Construct the new URL, redirecting to the base path of your app
+    // and preserving the original query and hash
+    var newUrl = '/messa-di-voce/' + query + hash;
+
+    // Redirect to the new URL
+    window.location.replace(newUrl);
+  </script>
+</head>
+<body>
+  If you are not redirected automatically, follow this <a href="/messa-di-voce/">link</a>.
+</body>
+</html>
