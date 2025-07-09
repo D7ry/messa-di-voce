@@ -4,21 +4,14 @@
   <meta charset="utf-8">
   <title>Redirecting...</title>
   <script>
-    // Get the current path, excluding the domain
-    var path = window.location.pathname;
     // Get the query string
     var query = window.location.search;
     // Get the hash
     var hash = window.location.hash;
 
     // Construct the new URL, redirecting to the base path of your app
-    // and preserving the original path, query, and hash
-    var newUrl = '/messa-di-voce/' + path.substring(path.indexOf('/messa-di-voce/') + '/messa-di-voce/'.length) + query + hash;
-
-    // If the path is just the root of the repo, ensure it redirects to the base path
-    if (path === '/messa-di-voce/' || path === '/') {
-      newUrl = '/messa-di-voce/';
-    }
+    // and preserving the original query and hash
+    var newUrl = '/messa-di-voce/' + query + hash;
 
     // Redirect to the new URL
     window.location.replace(newUrl);
